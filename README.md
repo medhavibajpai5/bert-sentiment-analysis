@@ -44,12 +44,12 @@ python app.py predict --text "The movie was absolutely fantastic!"
 
 **Output:**
 
-**==============================**
+==============================
 **📝 Input: The movie was absolutely fantastic!**
-**------------------------------**
+------------------------------
 **📊 Sentiment: Positive**
 **📈 Confidence: 98.45%**
-**==============================**
+==============================
 
 
 ## 📄 Resume Bullet Points
