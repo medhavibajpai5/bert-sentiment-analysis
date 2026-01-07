@@ -2,13 +2,13 @@ import streamlit as st
 import torch
 import torch.nn.functional as F
 from transformers import BertTokenizer
-import os
+from huggingface_hub import hf_hub_download
 
 from src.model import BERTClassifier
 
-# -----------------------
-# Page Config
-# -----------------------
+# =========================
+# Streamlit Page Config
+# =========================
 st.set_page_config(
     page_title="BERT Sentiment Analysis",
     page_icon="🤖",
@@ -16,37 +16,46 @@ st.set_page_config(
 )
 
 st.title("🤖 BERT Sentiment Analysis")
-st.write("Fine-tuned BERT model for sentiment classification.")
+st.write("Sentiment analysis using a fine-tuned BERT model (PyTorch).")
 
-# -----------------------
-# Config
-# -----------------------
-MODEL_PATH = "models/best_bert_model.bin"
+# =========================
+# Configuration
+# =========================
+REPO_ID = "medhavibajpai5/bert-sentiment-analysis-medhavi"
+MODEL_FILENAME = "best_bert_model.bin"
+
 MAX_LEN = 128
 NUM_CLASSES = 3
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# -----------------------
-# Load Model (Cached)
-# -----------------------
+# =========================
+# Load Model & Tokenizer
+# =========================
 @st.cache_resource
 def load_model():
+    # Download model from Hugging Face Hub
+    model_path = hf_hub_download(
+        repo_id=REPO_ID,
+        filename=MODEL_FILENAME
+    )
+
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 
     model = BERTClassifier(n_classes=NUM_CLASSES)
     model.load_state_dict(
-        torch.load(MODEL_PATH, map_location=DEVICE)
+        torch.load(model_path, map_location=DEVICE)
     )
     model.to(DEVICE)
     model.eval()
 
     return tokenizer, model
 
+
 tokenizer, model = load_model()
 
-# -----------------------
+# =========================
 # UI
-# -----------------------
+# =========================
 text = st.text_area(
     "Enter text to analyze sentiment",
     placeholder="I absolutely loved this product!",
